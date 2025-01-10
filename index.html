@@ -1,0 +1,241 @@
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BM DOT LK Weather</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --container-bg: #f5f5f5;
+            --text-color: #333333;
+            --input-bg: #ffffff;
+            --input-text: #333333;
+            --weather-info-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --input-bg: #3d3d3d;
+            --input-text: #ffffff;
+            --weather-info-bg: #3d3d3d;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            text-align: center;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            margin-right: 10px;
+            background: var(--input-bg);
+            color: var(--input-text);
+            width: 60%;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .weather-info {
+            margin-top: 25px;
+            font-size: 18px;
+            background: var(--weather-info-bg);
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 25px;
+        }
+
+        .search {
+            margin: 20px 0;
+        }
+
+        .weather-info h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+
+        /* Theme Toggle Switch Styles */
+        .theme-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .theme-switch span {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-switch">
+        <span>🌞</span>
+        <label class="switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider"></span>
+        </label>
+        <span>🌙</span>
+    </div>
+    <div class="container">
+        <h1>BM DOT LK</h1>
+        <div class="search">
+            <input type="text" id="city" placeholder="Enter city name">
+            <button onclick="getWeather()">Get Weather</button>
+        </div>
+        <div id="weatherInfo" class="weather-info">
+            <!-- Weather info will appear here -->
+        </div>
+    </div>
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Weather Functionality
+        async function getWeather() {
+            const city = document.getElementById('city').value;
+            const apiKey = '150eef06328c2f793ad8300c70070f9a';
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('City not found');
+                const data = await response.json();
+                const weatherEmojis = {
+                    Clear: "☀️",
+                    Clouds: "☁️",
+                    Rain: "🌧️",
+                    Drizzle: "🌦️",
+                    Thunderstorm: "⛈️",
+                    Snow: "❄️",
+                    Mist: "🌫️",
+                    Smoke: "💨",
+                    Haze: "🌫️",
+                    Dust: "🌪️",
+                    Fog: "🌫️",
+                    Sand: "🌪️",
+                    Ash: "🌋",
+                    Squall: "🌪️",
+                    Tornado: "🌪️"
+                };
+                const weatherMain = data.weather[0].main;
+                const weatherEmoji = weatherEmojis[weatherMain] || "🌈";
+                const weatherInfo = `
+                    <h2>${data.name}</h2>
+                    <p>Temperature: ${data.main.temp}°C</p>
+                    <p>Weather: ${weatherMain} ${weatherEmoji}</p>
+                    <p>Humidity: ${data.main.humidity}%</p>
+                `;
+                document.getElementById('weatherInfo').innerHTML = weatherInfo;
+            } catch (error) {
+                document.getElementById('weatherInfo').innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
